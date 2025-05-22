@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weather Widget</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+<div class="mx-32 my-10 space-y-10 ">
+    <section class="w-full">
+        <div class="row d-flex justify-content-between space-y-10">
+            <form id="weatherForm">
+                <input  class="border border-slate-300 p-2 rounded-md" id="cityName" type="text" placeholder="Enter City Name">
+                <button class="bg-blue-200 p-2 rounded-md"   type="submit">Get Weather</button>
+            </form>
+
+            <div class="grid grid-cols-3 gap-4 w-full">
+                <article class="space-y-4">
+                    <h1 class="text-xl">Title 1</h1>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus convallis dapibus varius. Praesent consequat ornare lorem, ac vulputate sapien volutpat quis. Curabitur faucibus, quam sit amet tempor viverra, magna tellus commodo elit, id imperdiet diam justo quis sapien. In porttitor sem ac neque porta, eu egestas risus fringilla. Curabitur lorem lacus, lobortis non egestas in, consequat at arcu. Phasellus viverra lectus nibh, eu dictum purus suscipit ut. Donec finibus diam quis libero porta tincidunt.
+                    </p>
+                </article>
+
+            <article class="space-y-4">
+                <h1 class="text-xl">Title 2</h1>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus convallis dapibus varius. Praesent consequat ornare lorem, ac vulputate sapien volutpat quis. Curabitur faucibus, quam sit amet tempor viverra, magna tellus commodo elit, id imperdiet diam justo quis sapien. In porttitor sem ac neque porta, eu egestas risus fringilla. Curabitur lorem lacus, lobortis non egestas in, consequat at arcu. Phasellus viverra lectus nibh, eu dictum purus suscipit ut. Donec finibus diam quis libero porta tincidunt.
+                </p>
+            </article>
+
+            <article class="space-y-4">
+                <h1 class="text-xl">Title 3</h1>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus convallis dapibus varius. Praesent consequat ornare lorem, ac vulputate sapien volutpat quis. Curabitur faucibus, quam sit amet tempor viverra, magna tellus commodo elit, id imperdiet diam justo quis sapien. In porttitor sem ac neque porta, eu egestas risus fringilla. Curabitur lorem lacus, lobortis non egestas in, consequat at arcu. Phasellus viverra lectus nibh, eu dictum purus suscipit ut. Donec finibus diam quis libero porta tincidunt.
+                </p>
+            </article>
+            </div>
+
+        </div>
+    </section>
+    <div class="fixed bottom-5 right-5 border border-slate-300 w-50 h-50 rounded-md flex flex-col items-center bg-white">
+        <div class="size-25" id="icon"></div>
+        <div class="text-lg" id="temp"></div>
+        <div class="text-xl" id="city"></div>
+    </div>
+
+</div>
+
+<script>
+
+    let icon = document.getElementById('icon');
+    let temp = document.getElementById('temp');
+
+    let cityDisplay = document.getElementById('city');
+    let cityName = document.getElementById('cityName');
+    let weatherForm = document.getElementById('weatherForm');
+
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    let data = JSON.parse(xhr.responseText);
+
+                    // Icon
+                    let img = document.createElement('img');
+                    img.src = "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
+                    icon.appendChild(img);
+
+                    // Temperature
+                    temp.innerHTML = Math.round(data.main.temp) + " ºC";
+
+                    // City Name
+                    cityDisplay.innerHTML = data.name;
+                }
+            };
+
+            xhr.open("GET", "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&units=metric&appid=fe85410ba320735aee66f572e91933c2", true);
+            xhr.send();
+        });
+    } else {
+        console.log("Geolocation is not available.");
+    }
+
+    weatherForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let city = cityName.value;
+
+        icon.innerHTML = "";
+        temp.innerHTML = "";
+        cityDisplay.innerHTML = "";
+
+        //API Request
+        let xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                let data = JSON.parse(xhr.responseText);
+
+                // Icon
+                let img = document.createElement('img');
+                img.src = "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
+                icon.appendChild(img);
+
+                // Temperature
+                temp.innerHTML = Math.round(data.main.temp) + " ºC";
+
+                // City Name
+                cityDisplay.innerHTML = data.name;
+                // console.log(data.name);
+            }
+        };
+
+        xhr.open("GET", "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=fe85410ba320735aee66f572e91933c2", true);
+        xhr.send();
+    });
+
+</script>
+</body>
+</html>
